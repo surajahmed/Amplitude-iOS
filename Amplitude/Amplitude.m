@@ -339,7 +339,13 @@ static NSString *const SEQUENCE_NUMBER = @"sequence_number";
     for (id event in events) {
         NSError *error = nil;
         NSData *jsonData = nil;
-        jsonData = [NSJSONSerialization dataWithJSONObject:[AMPUtils makeJSONSerializable:event] options:0 error:&error];
+        @try {
+            jsonData = [NSJSONSerialization dataWithJSONObject:[AMPUtils makeJSONSerializable:event] options:0 error:&error];
+        } 
+        @catch (NSException *exception) {
+            AMPLITUDE_ERROR(@"ERROR: NSJSONSerialization error: %@", exception.reason);
+            continue;
+        }
         if (error != nil) {
             AMPLITUDE_ERROR(@"ERROR: NSJSONSerialization error: %@", error);
             continue;
@@ -613,7 +619,15 @@ static NSString *const SEQUENCE_NUMBER = @"sequence_number";
 
         // convert event dictionary to JSON String
         NSError *error = nil;
-        NSData *jsonData = [NSJSONSerialization dataWithJSONObject:[AMPUtils makeJSONSerializable:event] options:0 error:&error];
+        NSData *jsonData = nil;
+        @try {
+            jsonData = [NSJSONSerialization dataWithJSONObject:[AMPUtils makeJSONSerializable:event] options:0 error:&error];
+        } 
+        @catch (NSException *exception) {
+            AMPLITUDE_ERROR(@"ERROR: NSJSONSerialization error: %@", exception.reason);
+            return;
+        }
+        
         if (error != nil) {
             AMPLITUDE_ERROR(@"ERROR: could not JSONSerialize event type %@: %@", eventType, error);
             return;
@@ -832,7 +846,14 @@ static NSString *const SEQUENCE_NUMBER = @"sequence_number";
 
         NSError *error = nil;
         NSData *eventsDataLocal = nil;
-        eventsDataLocal = [NSJSONSerialization dataWithJSONObject:uploadEvents options:0 error:&error];
+        @try {
+            eventsDataLocal = [NSJSONSerialization dataWithJSONObject:uploadEvents options:0 error:&error];
+        }
+        @catch (NSException *exception) {
+            AMPLITUDE_ERROR(@"ERROR: NSJSONSerialization error: %@", exception.reason);
+            _updatingCurrently = NO;
+            return;
+        }
         if (error != nil) {
             AMPLITUDE_ERROR(@"ERROR: NSJSONSerialization error: %@", error);
             _updatingCurrently = NO;
@@ -1152,7 +1173,7 @@ static NSString *const SEQUENCE_NUMBER = @"sequence_number";
 {
     if (_trackingSessionEvents) {
         [self sendSessionEvent:kAMPSessionEndEvent];
-    }
+    }d
     [self setSessionId:[timestamp longLongValue]];
     [self refreshSessionTime:timestamp];
     if (_trackingSessionEvents) {
