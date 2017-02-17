@@ -1173,7 +1173,7 @@ static NSString *const SEQUENCE_NUMBER = @"sequence_number";
 {
     if (_trackingSessionEvents) {
         [self sendSessionEvent:kAMPSessionEndEvent];
-    }d
+    }
     [self setSessionId:[timestamp longLongValue]];
     [self refreshSessionTime:timestamp];
     if (_trackingSessionEvents) {
